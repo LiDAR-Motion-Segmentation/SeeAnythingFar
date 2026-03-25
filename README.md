@@ -32,3 +32,6 @@ python3 demo.py \
 --data_path /scratch/soumo_roy/semantic-kitty-dataset/dataset/sequences/00/velodyne/000000.bin 
 ```
 ![pic](./assets/pvrcnn.png)
+
+## Slide Deck
+- I am attaching the slide deck of the experiments done [link](https://docs.google.com/presentation/d/13FvgcBmLo90PO2pVOTtf5GvFLkXOykHQLE2QgfY7nAM/edit?usp=sharing)

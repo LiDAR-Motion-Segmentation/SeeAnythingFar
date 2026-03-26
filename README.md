@@ -35,3 +35,9 @@ python3 demo.py \
 
 ## Slide Deck
 - I am attaching the slide deck of the experiments done [link](https://docs.google.com/presentation/d/13FvgcBmLo90PO2pVOTtf5GvFLkXOykHQLE2QgfY7nAM/edit?usp=sharing)
+
+## Environment setup
+```
+uv pip install -e .
+source .venv/bin/activate
+```

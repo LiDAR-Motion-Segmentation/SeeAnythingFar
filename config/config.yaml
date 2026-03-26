@@ -1,0 +1,9 @@
+defaults:
+  - model/backbone2d: dino_fpn
+  - model/backbone3d: sonata
+  - model/head: transfusion
+  - _self_
+
+system:
+  _target_ : systems.multi_modal_system.MultiModalDetectorSystem
+  learning_rate : 1e-4

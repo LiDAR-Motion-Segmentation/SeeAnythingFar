@@ -1,0 +1,6 @@
+_target_: src.seeanything.models.backbone_3d.sonata.SonataEncoder
+in_channels: 4 # standard LiDAR (X, Y, Z, intensity)
+embed_dim: 256
+grid_extents: [-51.2, -51.2, 51.2, 51.2] # NuScenes standard range
+voxel_size: [0.1, 0.1]
+pretrained: true

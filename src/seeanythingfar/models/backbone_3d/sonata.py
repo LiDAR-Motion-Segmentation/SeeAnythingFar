@@ -79,3 +79,28 @@ class SonataEncoder(BaseBackbone3D):
         # Return both the point-level tokens (for Segmentation) 
         # and the dense grid (for Detection/TransFusion)
         return point_tokens, bev_features       
+    
+    def _scatter_to_bev(self, tokens: torch.Tensor, coords: torch.Tensor, batch_idx: torch.Tensor, batch_size: int) -> torch.Tensor:
+        """Projects sparse 3D point tokens into a dense 2D Bird's-Eye-View grid."""
+        
+        # discretize X and Y coordinates into grid indices
+        x_idx = ((coords[:, 0] - self.grid_extents[0]) / self.voxel_size[0]).long()
+        y_idx = ((coords[:, 1] - self.grid_extents[1]) / self.voxel_size[1]).long()
+        
+        # filter out points that fall outside our defined BEV grid bounds
+        mask = (x_idx >= 0) & (x_idx < self.bev_width) & \
+               (y_idx >= 0) & (y_idx < self.bev_height)
+               
+        token_valid = tokens[mask]
+        x_valid = x_idx[mask]
+        y_valid = y_idx[mask]
+        b_valid = batch_idx[mask]
+        
+        # BEV tensor shape (B, C, H, W)
+        device = tokens.device
+        bev_dense = torch.zeros((batch_size, self.embed_dim, self.bev_height, self.bev_width), device=device)
+        
+        # Scatter (using PyTorch advanced indexing)
+        bev_dense[b_valid, :, y_valid, x_valid] = token_valid
+        
+        return bev_dense

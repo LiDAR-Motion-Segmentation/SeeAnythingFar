@@ -30,3 +30,32 @@ class DINO_FPN(BaseBackbone2D):
             for param in self.dino.parameters():
                 param.requires_grad = False
             self.dino.eval() # Ensure dropout/batchnorm are locked
+            
+        # Simple Feature Pyramid Network (ViTDet style)
+        # TransFusion usually expects features at different resolutions.
+        # DINO gives us a 1/14 resolution grid. We will project it to 256 channels,
+        # and create multi-scale maps (e.g., standardizing to something like 1/8 and 1/16)
+        
+        # scale 1: upsample from 1/14 to ~1/8 using Transposed Conv
+        self.fpn_up = nn.Sequential(
+            nn.ConvTranspose2d(self.embed_dim, out_channel, kernel_size=2, stride=2),
+            nn.BatchNorm2d(out_channel),
+            nn.GELU()
+        )
+        
+        # scale 2: Keep roughly the same resolution (1/14 projected to 256 dims)
+        self.fpn_mid = nn.Sequential(
+            nn.Conv2d(self.embed_dim, out_channel, kernel_size=1),
+            nn.BatchNorm2d(out_channel),
+            nn.GELU()
+        )
+        
+        # scale 3: Downsample from 1/14 to ~1/32 using strided Conv
+        self.fpn_down = nn.Sequential(
+            nn.Conv2d(self.embed_dim, out_channel, kernel_size=3, stride=2, padding=1),
+            nn.BatchNorm2d(out_channel),
+            nn.GELU()
+        )
+        
+    def forward(self, images: torch.Tensor) -> Dict[str, torch.Tensor]:
+        pass

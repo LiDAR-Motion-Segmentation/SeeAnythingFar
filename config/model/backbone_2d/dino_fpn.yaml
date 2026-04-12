@@ -1,0 +1,4 @@
+_target_: src.seeanythingfar.models.backbone_2d.dino_fpn.DINO_FPN
+model_size: 'vits14'
+out_channels: 256
+freeze_dino: true

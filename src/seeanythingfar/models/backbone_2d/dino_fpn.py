@@ -58,4 +58,40 @@ class DINO_FPN(BaseBackbone2D):
         )
         
     def forward(self, images: torch.Tensor) -> Dict[str, torch.Tensor]:
-        pass
+        """
+        Args:
+            images: Tensor of shape (B, 3, H, W). 
+                    Note: H and W should ideally be divisible by 14.
+        Returns:
+            Dict of multi-scale feature maps.
+        """
+        
+        B, C, H, W = images.shape
+        
+        # calculate spatial dimensions of the grid
+        h_grid = H // self.patch_size
+        w_grid = W // self.patch_size
+        
+        # Extract features from DINOv2
+        # We use a context manager to enforce no-gradients if frozen
+        with torch.set_grad_enabled(next(self.parameters()).required_grad):
+            features = self.dino.forward_features(images)
+            
+            patch_tokens = features['x_norm_patchtokens'] # Shape: (B, N, D)
+            
+        # spatial reshape (Token to Grid)
+        spatial_grid = rearrange(
+            patch_tokens,
+            'b (h w) d -> b d h w',
+            h=h_grid,
+            w=w_grid 
+        )
+        
+        # building the feature pyramid
+        multi_scale_features = {
+            'stride_8': self.fpn_up(spatial_grid),    # High-res for small distant objects
+            'stride_16': self.fpn_mid(spatial_grid),  # Base DINO resolution
+            'stride_32': self.fpn_down(spatial_grid)  # Low-res for global context
+        }
+        
+        return multi_scale_features

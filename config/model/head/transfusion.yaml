@@ -1,0 +1,6 @@
+# conf/model/head/transfusion.yaml
+_target_: src.seeanythingfar.models.fusion_heads.transfusion.TransFusionHead
+in_channels: 256
+num_classes: 10 # NuScenes standard classes
+num_queries: 200 # Standard Top-K for CenterPoint
+image_feature_scale: 'stride_8' # Cross-attend to the highest resolution DINOv3 features

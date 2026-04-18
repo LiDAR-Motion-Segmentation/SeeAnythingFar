@@ -7,7 +7,7 @@ stop immediately, for which long horizon planning has to be done for which we ne
 and segment faraway objects.
 
 ## Architecture 
-![arch](./assets/arch_v1.png)
+![arch](./assets/arch_v2.png)
 
 ## Slurm
 - added local cuda setup for version 12.8 for compatibility

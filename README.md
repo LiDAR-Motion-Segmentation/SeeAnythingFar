@@ -1,6 +1,9 @@
 # SeeAnythingFar
 Teaching Robots To See Far Away Obstacles!
 
+## Architecture 
+![arch](./assets/arch_v1.png)
+
 ## Slurm
 - added local cuda setup for version 12.8 for compatibility
 - code is in `slurm/neon/cuda_setup.sh`

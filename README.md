@@ -1,6 +1,11 @@
 # SeeAnythingFar
 Teaching Robots To See Far Away Obstacles!
 
+The idea behind doing this was long range and sparse detection of 3D pointclouds to do long horizon
+planning for autonomous vehicles, which have heavy mass or are moving at high speed, as they cannot
+stop immediately, for which long horizon planning has to be done for which we need to detect, track
+and segment faraway objects.
+
 ## Architecture 
 ![arch](./assets/arch_v1.png)
 

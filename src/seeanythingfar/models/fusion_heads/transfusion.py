@@ -52,7 +52,7 @@ class TransFusionHead(BaseFusionHead):
     def forward(self,
                 bev_features: torch.Tensor,
                 image_features: Dict[str, torch.Tensor],
-                calibration: Dict[str, torch.Tensor]
+                calibrations: Dict[str, torch.Tensor]
                 ) -> Dict[str, torch.Tensor]:
         B = bev_features.size(0)
         
@@ -70,8 +70,42 @@ class TransFusionHead(BaseFusionHead):
         # target the high-res Dinov3 feature
         target_img_feat = image_features[self.target_scale]
         
+        # sample the local 3x3 patch windows (N_k x D space)
+        # sampled_keys shape: [B, num_queries, N_k, embed_dim]
+        sampled_keys = self._project_and_sample(
+            query_centers,
+            target_img_feat, 
+            calibrations
+        )
         
+        # cross attention and refinement
+        # PyTorch MHA expects: Query [B, Target_Seq, D], Key/Val [B, Source_Seq, D]
+        # We process each query against its local window.
         
+        updated_queries = []
+        for b in range(B):
+            # Q: [num_queries, 1, D]
+            q = queries[b].unsqueeze(1)
+            # K, V: [num_queries, N_k, D]
+            k = sampled_keys[b]
+            v = sampled_keys[b]  # same huh?
+            
+            # Attn Out: [num_queries, 1, D]
+            attn_out, _ = self.cross_attention(q, k, v)
+            updated_queries.append(attn_out.squeeze(1))
+            
+        updated_queries = torch.stack(updated_queries, dim = 0) # [B, num_queries, D]
+        
+        # Add residual connections (Original 3D Geometry + 2D Semantics)
+        fused_queries = queries + updated_queries
+        
+        # Final bounding box predictions
+        final_boxes = self.final_box_mlp(fused_queries)
+        
+        return {
+            "heatmaps": heatmaps,
+            "final_boxes": final_boxes
+        }
     
     def _get_topk_proposals():
         pass

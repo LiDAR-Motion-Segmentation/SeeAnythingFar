@@ -107,8 +107,17 @@ class TransFusionHead(BaseFusionHead):
             "final_boxes": final_boxes
         }
     
-    def _get_topk_proposals():
-        pass
+    def _get_topk_proposals(self, bev_feat, heatmap, z_height, K):
+        """Mock function: Extracts features and 3D centers of the hottest BEV pixels."""
+        B, C, _, _ = bev_feat.shape
+        # In practice, this requires argmax over the spatial dimensions,
+        # gathering the corresponding (X, Y) indices, fetching the Z value,
+        # and pulling the C-dimensional feature vector.
+        
+        # Returning dummy tensors for architectural completeness
+        dummy_queries = torch.randn(B, K, C).to(bev_feat.device)
+        dummy_centers = torch.randn(B, K, 3).to(bev_feat.device)
+        return dummy_queries, dummy_centers
     
     def _project_and_sample():
         pass

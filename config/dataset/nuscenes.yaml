@@ -1,0 +1,32 @@
+# Infos are built by tools/create_nuscenes_infos.py
+data_root: ${oc.env:NUSCENES_ROOT,/data/nuscenes}
+class_names: [car, truck, construction_vehicle, bus, trailer, barrier, motorcycle, bicycle, pedestrian, traffic_cone]
+seg_class_names: [barrier, bicycle, bus, car, construction_vehicle, motorcycle, pedestrian, traffic_cone,
+                  trailer, truck, driveable_surface, other_flat, sidewalk, terrain, manmade, vegetation]
+
+train:
+  _target_: seeanythingfar.datasets.nuscenes.NuScenesDataset
+  data_root: ${dataset.data_root}
+  info_path: ${dataset.data_root}/nuscenes_infos_train.pkl
+  pc_range: ${pc_range}
+  class_names: ${dataset.class_names}
+  image_size: ${image_size}
+  max_sweeps: 1        # >1 adds past sweeps; set model.backbone_3d.in_channels: 5 to feed their time lag
+  load_seg: true
+  augment:
+    _target_: seeanythingfar.datasets.transforms.GlobalAugment
+    rot_range: [-0.785, 0.785]
+    scale_range: [0.95, 1.05]
+    flip_x_prob: 0.5
+    flip_y_prob: 0.5
+
+val:
+  _target_: seeanythingfar.datasets.nuscenes.NuScenesDataset
+  data_root: ${dataset.data_root}
+  info_path: ${dataset.data_root}/nuscenes_infos_val.pkl
+  pc_range: ${pc_range}
+  class_names: ${dataset.class_names}
+  image_size: ${image_size}
+  max_sweeps: ${dataset.train.max_sweeps}
+  load_seg: true
+  augment: null

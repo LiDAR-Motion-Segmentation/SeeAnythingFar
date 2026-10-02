@@ -1,0 +1,7 @@
+# Dependency-free stand-in for Sonata, for smoke tests only.
+defaults:
+  - sonata
+  - _self_
+backend: mlp
+freeze: false
+pretrained: false

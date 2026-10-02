@@ -1,0 +1,29 @@
+# End-to-end smoke test on procedural data: no nuScenes, no Sonata, no weight downloads.
+#   python train.py --config-name smoke            (CPU is fine)
+defaults:
+  - config
+  - override dataset: synthetic
+  - override model/backbone_3d: mlp
+  - _self_
+
+pc_range: [-25.6, -25.6, -5.0, 25.6, 25.6, 3.0]
+image_size: [128, 224]
+
+model:
+  backbone_2d:
+    pretrained: false
+  head:
+    num_queries: 50
+    hidden_channels: 64
+    ffn_channels: 128
+
+data:
+  batch_size: 2
+  num_workers: 0
+
+trainer:
+  max_epochs: 1
+  accelerator: cpu
+  limit_train_batches: 4
+  limit_val_batches: 2
+  log_every_n_steps: 1

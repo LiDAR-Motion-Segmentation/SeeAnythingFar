@@ -1,6 +1,24 @@
-# conf/model/head/transfusion.yaml
-_target_: src.seeanythingfar.models.fusion_heads.transfusion.TransFusionHead
-in_channels: 256
-num_classes: 10 # NuScenes standard classes
-num_queries: 200 # Standard Top-K for CenterPoint
-image_feature_scale: 'stride_8' # Cross-attend to the highest resolution DINOv3 features
+_target_: seeanythingfar.models.fusion_heads.transfusion.TransFusionHead
+in_channels: ${model.backbone_3d.embed_dim}
+hidden_channels: 128
+num_classes: 10           # NuScenes standard classes
+num_queries: 200          # Standard Top-K for CenterPoint
+pc_range: ${pc_range}
+bev_cell_size: [0.4, 0.4] # = backbone_3d.bev_voxel_size * backbone_3d.bev_stride
+image_feature_scale: stride_8   # Cross-attend to the highest resolution DINOv3 features
+image_channels: ${model.backbone_2d.out_channels}
+num_heads: 8
+ffn_channels: 256
+dropout: 0.1
+num_lidar_layers: 1       # TransFusion-L decoder over the BEV map
+num_fusion_layers: 1      # camera cross-attention layers
+window_size: 3
+nms_kernel_size: 3
+no_nms_classes: [8, 9]    # pedestrian, traffic_cone
+gaussian_overlap: 0.1
+min_radius: 2
+code_weights: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.2, 0.2]
+loss_weights: {heatmap: 1.0, z: 0.25, cls: 1.0, box: 0.25}
+assigner: {cls_weight: 0.15, reg_weight: 0.25, iou_weight: 0.25}
+score_threshold: 0.0
+post_center_range: null

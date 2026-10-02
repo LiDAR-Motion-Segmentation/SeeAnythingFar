@@ -50,9 +50,25 @@ class BaseFusionHead(nn.Module, ABC):
         """
         Args:
             bev_features: 3D queries/features (B, C_bev, H_bev, W_bev)
-            image_features: Output from BaseBackbone2D
-            calibrations: Intrinsics and extrinsics for 3D-to-2D projection
+            image_features: Output from BaseBackbone2D, each map shaped (B, N_cam, C, h, w)
+            calibrations: 'lidar2img' (B, N_cam, 4, 4) and 'image_hw' (H, W) of the
+                network input images, for 3D-to-2D projection
         Returns:
             Dict containing predicted bounding boxes, classes, and scores.
+        """
+        pass
+
+
+class BaseSegHead(nn.Module, ABC):
+    """
+    Contract for the point-wise semantic segmentation decoder.
+    """
+    @abstractmethod
+    def forward(self, point_tokens: torch.Tensor) -> torch.Tensor:
+        """
+        Args:
+            point_tokens: (Total_N, D) from BaseBackbone3D
+        Returns:
+            (Total_N, num_seg_classes) logits
         """
         pass

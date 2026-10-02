@@ -1,0 +1,19 @@
+class_names: [c0, c1, c2, c3, c4, c5, c6, c7, c8, c9]
+seg_class_names: [s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, ground]
+
+train:
+  _target_: seeanythingfar.datasets.synthetic.SyntheticDataset
+  length: 16
+  pc_range: ${pc_range}
+  image_size: ${image_size}
+  seed: 0
+  augment:
+    _target_: seeanythingfar.datasets.transforms.GlobalAugment
+
+val:
+  _target_: seeanythingfar.datasets.synthetic.SyntheticDataset
+  length: 4
+  pc_range: ${pc_range}
+  image_size: ${image_size}
+  seed: 1
+  augment: null

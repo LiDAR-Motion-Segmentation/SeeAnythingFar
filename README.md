@@ -9,6 +9,32 @@ and segment faraway objects.
 ## Architecture 
 ![arch](./assets/arch_v2.png)
 
+| diagram block | code |
+|---|---|
+| Sonata (PTv3) encoder, point tokens, scatter to BEV grid | `src/seeanythingfar/models/backbone_3d/sonata.py` |
+| DINOv3, flat patch tokens, spatial reshape, SimpleFPN | `src/seeanythingfar/models/backbone_2d/dino_fpn.py` |
+| CenterPoint heatmap (Z prediction), 3D object queries, cross attention fusion, detection FFN | `src/seeanythingfar/models/fusion_heads/transfusion.py` |
+| Geometric bridge (3D to 2D projection) | `src/seeanythingfar/utils/geometry.py` |
+| Linear decoder (point-wise segmentation) | `src/seeanythingfar/models/seg_heads/linear.py` |
+| everything wired together | `src/seeanythingfar/models/detector.py` |
+
+## Quickstart
+```bash
+uv pip install -e ".[dev,nuscenes]"
+pytest                                        # CPU, no data or downloads needed
+python train.py --config-name smoke           # synthetic end-to-end run, CPU
+
+# nuScenes
+python tools/create_nuscenes_infos.py --data-root $NUSCENES_ROOT --out-dir $NUSCENES_ROOT --max-sweeps 10
+NUSCENES_ROOT=/path/to/nuscenes python train.py
+python eval.py +ckpt=outputs/<run>/checkpoints/last.ckpt
+python eval.py +ckpt=... system.nuscenes_export=results/nusc.json +official=true   # devkit mAP / NDS
+python visualize.py +ckpt=... +index=0 +out=viz
+```
+The real 3D backbone needs the `sonata` package (follow the install instructions at
+https://github.com/facebookresearch/sonata: spconv, torch_scatter, optionally flash-attn).
+Without it, `model/backbone_3d=mlp` runs a per-point MLP stand-in, which is for testing only.
+
 ## Slurm
 - added local cuda setup for version 12.8 for compatibility
 - code is in `slurm/neon/cuda_setup.sh`

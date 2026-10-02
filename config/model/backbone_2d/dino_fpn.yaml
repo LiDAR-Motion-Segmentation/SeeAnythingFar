@@ -1,4 +1,5 @@
-_target_: src.seeanythingfar.models.backbone_2d.dino_fpn.DINO_FPN
-model_size: 'vits14'
+_target_: seeanythingfar.models.backbone_2d.dino_fpn.DINO_FPN
+model_name: vit_small_patch16_dinov3.lvd1689m   # any timm DINOv3/DINOv2 ViT
 out_channels: 256
 freeze_dino: true
+pretrained: true

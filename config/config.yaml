@@ -1,9 +1,50 @@
+# Main training config:  python train.py [overrides]
+# Smoke test (synthetic data, no Sonata / pretrained weights):  python train.py --config-name smoke
 defaults:
-  - model/backbone2d: dino_fpn
-  - model/backbone3d: sonata
+  - dataset: nuscenes
+  - model/backbone_2d: dino_fpn
+  - model/backbone_3d: sonata
   - model/head: transfusion
+  - model/seg_head: linear
   - _self_
 
+seed: 0
+# [x_min, y_min, z_min, x_max, y_max, z_max] in the LiDAR frame; shared by data, backbone and head.
+# Widen x/y for longer range (keep it divisible by bev_voxel_size * bev_stride, and update
+# model.head.bev_cell_size if you change either).
+pc_range: [-51.2, -51.2, -5.0, 51.2, 51.2, 3.0]
+image_size: [448, 800]   # (H, W) network input; must be divisible by the DINO patch size (16)
+resume: null             # checkpoint path to resume training from
+
+model:
+  _target_: seeanythingfar.models.detector.SeeAnythingFar
+  seg_loss_weight: 1.0
+  seg_ignore_index: 255
+
 system:
-  _target_ : systems.multi_modal_system.MultiModalDetectorSystem
-  learning_rate : 1e-4
+  _target_: seeanythingfar.systems.multi_modal_system.MultiModalDetectorSystem
+  model: ${model}
+  class_names: ${dataset.class_names}
+  seg_class_names: ${dataset.seg_class_names}
+  learning_rate: 1e-4
+  weight_decay: 0.01
+  scheduler: onecycle
+  range_bins: [0.0, 30.0, 50.0, .inf]
+  nuscenes_export: null
+
+data:
+  batch_size: 2
+  num_workers: 4
+
+trainer:
+  max_epochs: 20
+  accelerator: auto
+  devices: 1
+  precision: 32
+  gradient_clip_val: 10.0
+  log_every_n_steps: 20
+  check_val_every_n_epoch: 1
+
+checkpoint:
+  monitor: val/mAP/all
+  mode: max

@@ -1,0 +1,5 @@
+_target_: seeanythingfar.models.seg_heads.linear.LinearDecoder
+in_channels: ${model.backbone_3d.embed_dim}
+num_classes: 16           # nuScenes-lidarseg challenge classes
+freeze: false             # the diagram's frozen decoder needs ckpt_path with linear-probe weights
+ckpt_path: null

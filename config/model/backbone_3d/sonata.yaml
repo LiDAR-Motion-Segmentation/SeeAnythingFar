@@ -1,6 +1,16 @@
-_target_: src.seeanything.models.backbone_3d.sonata.SonataEncoder
-in_channels: 4 # standard LiDAR (X, Y, Z, intensity)
+_target_: seeanythingfar.models.backbone_3d.sonata.SonataEncoder
+backend: sonata
+in_channels: 4            # standard LiDAR (X, Y, Z, intensity)
 embed_dim: 256
-grid_extents: [-51.2, -51.2, 51.2, 51.2] # NuScenes standard range
-voxel_size: [0.1, 0.1]
+pc_range: ${pc_range}
+bev_voxel_size: [0.2, 0.2]
+bev_stride: 2             # BEV cell = 0.4 m; must match model.head.bev_cell_size
+num_neck_blocks: 2
 pretrained: true
+freeze: true
+grid_size: 0.05           # Sonata input voxelisation in metres (Sonata's indoor default is 0.02)
+intensity_scale: 255.0    # nuScenes intensity range
+num_concat_levels: 2
+sonata_feat_dim: 1088
+download_root: null       # set to a /scratch path; the default cache is ~/.cache/sonata
+enable_flash: false

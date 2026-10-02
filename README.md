@@ -22,7 +22,7 @@ and segment faraway objects.
 ```bash
 uv pip install -e ".[dev,nuscenes]"
 pytest                                        # CPU, no data or downloads needed
-python train.py --config-name smoke           # synthetic end-to-end run, CPU
+python train.py --config-name config           # GPU
 
 # nuScenes
 python tools/create_nuscenes_infos.py --data-root $NUSCENES_ROOT --out-dir $NUSCENES_ROOT --max-sweeps 10
